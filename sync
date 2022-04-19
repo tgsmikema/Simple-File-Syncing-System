@@ -9,13 +9,8 @@ import sys
 
 
 def main():
-
-    # parse args from the stdin
-    dir_list = sys.argv
-    dir_list.pop(0)
-    print(dir_list)
-    # -------------------------
-
+    arg = sys.argv
+    print(arg)
     path = os.getcwd() + "/" + "README.md"
     time = os.path.getmtime(path)
     time = time.__trunc__()

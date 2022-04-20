@@ -40,14 +40,29 @@ def single_dir_syncing(dir_path):
                 # sync_dict[key][current_f_status_list][mod_t_str]
                 sync_log_mod_t_ts = util.convert_mod_str_to_ts(sync_dict[key][0][0])
                 if sync_log_mod_t_ts != file_obj.mod_time_tstamp:
-                    util.set_f_mod_time(file_obj.posix_path,sync_log_mod_t_ts)
+                    util.set_f_mod_time(file_obj.posix_path, sync_log_mod_t_ts)
                     continue
                 else:
                     continue
     # -----------------------------------------------------------------------------------
 
+    # util.update_sync_f(sync_file_path, sync_dict)
+    # print(sync_dict)
+
+    # part 2 of single dir sync ---------------------------------------------------------
+    dir_fname_list = []
+    for file_obj in file_obj_list:
+        dir_fname_list.append(file_obj.file_name)
+
+    for f_name_key in sync_dict.keys():
+        if f_name_key in dir_fname_list:
+            continue
+        else:
+            util.insert_delete_to_sync_dict(sync_dict, f_name_key)
+    # -----------------------------------------------------------------------------------
     util.update_sync_f(sync_file_path, sync_dict)
-    print(sync_dict)
+
+
 
 
 

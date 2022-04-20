@@ -39,9 +39,9 @@ def get_f_mod_time(f_path):
     return dt_time
 
 
-def set_f_mod_time(f_path, dt_time):
+def set_f_mod_time(f_path, ts_time):
     """set file modification time to an inputted file_path"""
-    dt_mod_time = dt_time.timestamp()
+    dt_mod_time = ts_time.timestamp()
     os.utime(f_path, (dt_mod_time, dt_mod_time))
 
 
@@ -63,9 +63,15 @@ def convert_mod_str_to_dt(dt_str):
     return dt_obj
 
 
-def gen_f_status_list(f_path):
-    """generate file status list including """
-    status_list = [get_f_mod_time_string(f_path), gen_digest(read_file(f_path))]
+def convert_mod_str_to_ts(dt_str):
+    """convert modification time STRING into TIMESTAMP format"""
+    dt_obj = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S %z')
+    return convert_dt_to_ts(dt_obj)
+
+
+def gen_f_status_list(f_obj):
+    """generate file status list including mod_time and digest"""
+    status_list = [f_obj.mod_time_str, f_obj.digest]
     return status_list
 
 
@@ -94,6 +100,20 @@ def is_sync_f_exist(dir_path):
     path_sync = str(dir_path) + "/.sync"
     path_s = Path(path_sync)
     return path_s.is_file()
+
+
+def insert_entry_to_sync_dict(sync_dict, file_object):
+    f_status_list = gen_f_status_list(file_object)
+    f_name_key = file_object.file_name
+    if sync_dict.keys().__contains__(f_name_key):
+        sync_dict[f_name_key].insert(0, f_status_list)
+
+
+def new_key_entry_to_sync_dict(sync_dict, file_object):
+    f_status_list = gen_f_status_list(file_object)
+    f_name_key = file_object.file_name
+    if not (sync_dict.keys().__contains__(f_name_key)):
+        sync_dict[f_name_key] = [f_status_list]
 
 
 def get_file_list_from_dir(dir_path):

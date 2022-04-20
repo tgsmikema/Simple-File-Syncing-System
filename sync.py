@@ -16,7 +16,9 @@ def single_dir_syncing(dir_path):
         util.create_empty_sync_f(dir_path)
 
     file_obj_list = util.get_file_list_from_dir(dir_path)
-    print(file_obj_list[0].mod_time_str)
+    # dir_posix_list = util.get_dir_list_from_dir(dir_path)
+    # print(dir_posix_list)
+
 
 def main():
     # parse args from the stdin and make sure it contains only 2 dirs

@@ -100,7 +100,6 @@ def get_file_list_from_dir(dir_path):
     """get all files(except .sync) in the dir and return a `list` of file Object"""
     dir_path = Path(dir_path)
     dir_list = os.listdir(dir_path)
-    print(dir_list)
     f_obj_list = []
 
     for file in dir_list:
@@ -110,12 +109,16 @@ def get_file_list_from_dir(dir_path):
 
     return f_obj_list
 
+
 def get_dir_list_from_dir(dir_path):
+    """return posix path format of dir paths in a list"""
+    dir_path = Path(dir_path)
     dir_list = os.listdir(dir_path)
     d_list = []
 
-    for file in dir_list:
-        if os.path.isdir(Path(file)):
-            d_list.append(file)
+    for each_dir in dir_list:
+        dir_posix_path = dir_path.joinpath(each_dir)
+        if os.path.isdir(Path(dir_posix_path)):
+            d_list.append(dir_posix_path)
 
     return d_list

@@ -12,31 +12,22 @@ import util
 
 
 def main():
-
     # parse args from the stdin
     dir_list = sys.argv
     dir_list.pop(0)
-    print(dir_list)
+    if not len(dir_list) == 2:
+        print("\nYou have to enter EXACTLY 2 directories!!\n PROGRAM EXITED...")
+        exit(1)
     # -------------------------
 
+    # boolean list is dir exist
+    boo_list = [Path(dir_list[0]).is_dir(), Path(dir_list[1]).is_dir()]
 
-    # print(dt_c.astimezone())
-    # dt = datetime.fromtimestamp(os.path.getmtime(path))
-    # print(dt)
+    # file_path_name = "README.md"
+    # path = Path(file_path_name)
+    #
+    # path1 = os.getcwd()
 
-    file_path_name = "README.md"
-    path = Path(file_path_name)
-
-    print(path)
-    print(util.read_file(path))
-
-    mod_t = util.get_f_mod_time(path)
-    print(mod_t)
-    print(util.convert_dt_to_ts(mod_t))
-
-    a = util.gen_f_status_list(path)
-    print(a)
 
 
 main()
-

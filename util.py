@@ -2,6 +2,7 @@
 # UPI: sma148
 
 import hashlib
+import json
 import os
 from pathlib import Path
 from datetime import datetime
@@ -38,26 +39,74 @@ def get_f_mod_time(f_path):
 
 
 def set_f_mod_time(f_path, dt_time):
+    """set file modification time to an inputted file_path"""
     dt_mod_time = dt_time.timestamp()
     os.utime(f_path, (dt_mod_time, dt_mod_time))
 
 
 def convert_dt_to_ts(dt_time):
+    """convert DATETIME format into int TIMESTAMP format"""
     return int(dt_time.timestamp())
 
 
-def get_mod_time_string(f_path):
+def get_f_mod_time_string(f_path):
+    """get modification time of FILE into STRING format"""
     dt_time = get_f_mod_time(f_path)
     dt_string = dt_time.strftime("%Y-%m-%d %H:%M:%S %z")
     return dt_string
 
 
 def convert_mod_str_to_dt(dt_str):
+    """convert modification time STRING into DATETIME format"""
     dt_obj = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S %z')
     return dt_obj
 
 
 def gen_f_status_list(f_path):
     """generate file status list including """
-    status_list = [get_mod_time_string(f_path), gen_digest(read_file(f_path))]
+    status_list = [get_f_mod_time_string(f_path), gen_digest(read_file(f_path))]
     return status_list
+
+
+def create_empty_sync_f(dir_path):
+    f_path = dir_path + "/.sync"
+    new_dict = {}
+    json_str = json.dumps(new_dict, indent=2)
+    write_to_file(f_path, json_str)
+    return f_path
+
+
+def update_sync_f(f_path, content_dict):
+    json_str = json.dumps(content_dict, indent=2)
+    write_to_file(f_path, json_str)
+
+
+def read_sync_f(f_path):
+    """return DICT type"""
+    json_str = read_file(f_path)
+    json_dict = json.loads(json_str)
+    return json_dict
+
+
+def get_file_list_from_dir(dir_path):
+    dir_list = os.listdir()
+    f_list = []
+
+    for file in dir_list:
+        if os.path.isfile(Path(file)):
+            f_list.append(file)
+
+    return f_list
+
+
+def get_dir_list_from_dir(dir_path):
+    dir_list = os.listdir()
+    d_list = []
+
+    for file in dir_list:
+        if os.path.isdir(Path(file)):
+            d_list.append(file)
+
+    return d_list
+
+

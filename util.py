@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 from datetime import datetime
+from file import File
 
 
 def gen_digest(f_content):
@@ -69,7 +70,8 @@ def gen_f_status_list(f_path):
 
 
 def create_empty_sync_f(dir_path):
-    f_path = dir_path + "/.sync"
+    f_path_str = str(dir_path) + "/.sync"
+    f_path = Path(f_path_str)
     new_dict = {}
     json_str = json.dumps(new_dict, indent=2)
     write_to_file(f_path, json_str)
@@ -88,19 +90,28 @@ def read_sync_f(f_path):
     return json_dict
 
 
+def is_sync_f_exist(dir_path):
+    path_sync = str(dir_path) + "/.sync"
+    path_s = Path(path_sync)
+    return path_s.is_file()
+
+
 def get_file_list_from_dir(dir_path):
-    dir_list = os.listdir()
-    f_list = []
+    """get all files(except .sync) in the dir and return a `list` of file Object"""
+    dir_path = Path(dir_path)
+    dir_list = os.listdir(dir_path)
+    print(dir_list)
+    f_obj_list = []
 
     for file in dir_list:
-        if os.path.isfile(Path(file)):
-            f_list.append(file)
+        f_posix_path = dir_path.joinpath(file)
+        if os.path.isfile(f_posix_path) and not (os.path.basename(f_posix_path) == ".sync"):
+            f_obj_list.append(File(f_posix_path))
 
-    return f_list
-
+    return f_obj_list
 
 def get_dir_list_from_dir(dir_path):
-    dir_list = os.listdir()
+    dir_list = os.listdir(dir_path)
     d_list = []
 
     for file in dir_list:
@@ -108,5 +119,3 @@ def get_dir_list_from_dir(dir_path):
             d_list.append(file)
 
     return d_list
-
-

@@ -62,11 +62,12 @@ def single_dir_syncing(dir_path):
     # -----------------------------------------------------------------------------------
     util.update_sync_f(sync_file_path, sync_dict)
 
-
-
-
-
-
+    # recursive function call for all sub-directories (single-dir-syncing) --------------
+    sub_dir_list = util.get_dir_list_from_dir(dir_path)
+    if len(sub_dir_list) != 0:
+        for sub_dir in sub_dir_list:
+            single_dir_syncing(sub_dir)
+    # -----------------------------------------------------------------------------------
 
 
 def main():

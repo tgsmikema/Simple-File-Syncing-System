@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
+# Author: Siqi Ma
+# UPI: sma148
+
 import os
 from datetime import datetime
-import hashlib
 import shutil
 import json
 from pathlib import Path
 import sys
+import util
 
 
 def main():
@@ -16,15 +19,21 @@ def main():
     print(dir_list)
     # -------------------------
 
-    path = os.getcwd() + "/" + "README.md"
-    time = os.path.getmtime(path)
-    time = time.__trunc__()
-    dt_c = datetime.fromtimestamp(time)
-    print(dt_c.astimezone())
-    dt = datetime.fromtimestamp(os.path.getmtime(path))
-    print(dt)
-    hashed_string = hashlib.sha256("ssss".encode('utf-8')).hexdigest()
-    print(hashed_string)
+
+    # print(dt_c.astimezone())
+    # dt = datetime.fromtimestamp(os.path.getmtime(path))
+    # print(dt)
+
+    file_path_name = "dir1" + "/" + "123.txt"
+    path = Path(file_path_name)
+
+    print(path)
+    print(util.read_file(path))
+
+    mod_t = util.get_mod_time_f(path)
+    print(mod_t)
+    print(util.convert_dt_to_ts(mod_t))
+
 
 main()
 

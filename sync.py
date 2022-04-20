@@ -24,15 +24,18 @@ def main():
     # dt = datetime.fromtimestamp(os.path.getmtime(path))
     # print(dt)
 
-    file_path_name = "dir1" + "/" + "123.txt"
+    file_path_name = "README.md"
     path = Path(file_path_name)
 
     print(path)
     print(util.read_file(path))
 
-    mod_t = util.get_mod_time_f(path)
+    mod_t = util.get_f_mod_time(path)
     print(mod_t)
     print(util.convert_dt_to_ts(mod_t))
+
+    a = util.gen_f_status_list(path)
+    print(a)
 
 
 main()

@@ -91,6 +91,8 @@ def merge_dir_syncing(curr_dir, other_dir):
         other_f_name_list.append(file_obj_o_temp_ONLY.file_name)
 
     for file_obj_curr in file_obj_l_curr:
+
+        # part 1 - Deletion Logic of merging sync -----------------------------------------------------------
         # is file DOESN'T exist in OTHER dir file list?
         if file_obj_curr.file_name not in other_f_name_list:
             # is file deleted in OTHER dir?
@@ -112,6 +114,10 @@ def merge_dir_syncing(curr_dir, other_dir):
                 util.copy_to_other_dir(file_obj_curr.posix_path, other_dir)
                 util.update_sync_dict_entry(file_obj_curr, sync_dict_other)
                 continue
+        # -------------------------------------------------------------------------------------------------
+
+        # part 2 - merging sync logic ---------------------------------------------------------------------
+
         # file EXIST in OTHER dir file list
         else:
             # is current file SHA256 digestion SAME with same file in the OTHER dir?
@@ -166,10 +172,13 @@ def merge_dir_syncing(curr_dir, other_dir):
                         util.copy_to_other_dir(temp_f_obj_other, curr_dir)
                         util.insert_entry_to_sync_dict(sync_dict_curr, temp_f_obj_other)
                         continue
+        # -------------------------------------------------------------------------------------------------------
 
+    # write updated sync dict into .sync(log) file
     util.update_sync_f(sync_f_path_curr, sync_dict_curr)
     util.update_sync_f(sync_f_path_other, sync_dict_other)
 
+    # Recursive logic for merging sync all subdirectories -----------------------------------------------
     curr_sub_dir_list = util.get_dir_list_from_dir(curr_dir)
     other_sub_dir_list = util.get_dir_list_from_dir(other_dir)
 
@@ -178,6 +187,7 @@ def merge_dir_syncing(curr_dir, other_dir):
         for sub_dir in curr_sub_dir_list:
             other_sub_dir_tail = util.get_tail_of_path_begin_slash(sub_dir)
             merge_dir_syncing(sub_dir, util.join_head_and_tail(other_sub_dir_head, other_sub_dir_tail))
+    # ---------------------------------------------------------------------------------------------------
 
 
 def main():
@@ -202,11 +212,14 @@ def main():
 
     dir_path_list = [Path(dir_list[0]), Path(dir_list[1])]
 
+    # sync all subsirectories with only dirs, no files will be synced in this stage.
     util.sync_dir_and_sub_dir_no_files(dir_path_list[0], dir_path_list[1])
 
+    # sync all files in a single directory
     for dir_path in dir_path_list:
         single_dir_syncing(dir_path)
 
+    # cross- merge sync across two directories and all related subdirectories
     merge_dir_syncing(dir_path_list[0], dir_path_list[1])
     merge_dir_syncing(dir_path_list[1], dir_path_list[0])
 

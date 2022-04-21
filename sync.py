@@ -68,6 +68,25 @@ def single_dir_syncing(dir_path):
 
 
 def merge_dir_syncing(curr_dir, other_dir):
+
+    curr_sub_dir_list = util.get_dir_list_from_dir(curr_dir)
+    other_sub_dir_list = util.get_dir_list_from_dir(other_dir)
+
+    curr_sub_dir_basename_list = []
+    other_sub_dir_basename_list = []
+
+    for curr_sub in curr_sub_dir_list:
+        curr_sub_dir_basename_list.append(os.path.basename(curr_sub))
+    for other_sub in other_sub_dir_list:
+        other_sub_dir_basename_list.append(os.path.basename(other_sub))
+
+    for i in range(len(curr_sub_dir_basename_list)):
+        if curr_sub_dir_basename_list[i] in other_sub_dir_basename_list:
+            continue
+        # copy dirs from CURRENT to OTHER if current dir doesn't exist in other dir
+        else:
+            shutil.copytree(curr_sub_dir_list[i], Path(str(other_dir)+"/"+curr_sub_dir_basename_list[i]))
+
     file_obj_l_curr = util.get_file_list_from_dir(curr_dir)
     file_obj_l_other = util.get_file_list_from_dir(other_dir)
 

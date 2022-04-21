@@ -54,8 +54,11 @@ def single_dir_syncing(dir_path):
     for f_name_key in sync_dict.keys():
         if f_name_key in dir_fname_list:
             continue
-        else:
+        # fixed bug of keep adding new entry of deletions everytime program is run
+        elif sync_dict[f_name_key][0][1] != "deleted":
             util.insert_delete_to_sync_dict(sync_dict, f_name_key)
+        else:
+            continue
     # -----------------------------------------------------------------------------------
     util.update_sync_f(sync_file_path, sync_dict)
 

@@ -42,7 +42,8 @@ def get_f_mod_time(f_path):
 
 def set_f_mod_time(f_path, ts_time):
     """set file modification time to an inputted file_path"""
-    dt_mod_time = ts_time.timestamp()
+    # check here, may need correction/correct
+    dt_mod_time = ts_time
     os.utime(f_path, (dt_mod_time, dt_mod_time))
 
 

@@ -11,8 +11,6 @@ import sys
 import util
 
 
-
-
 def single_dir_syncing(dir_path):
     if not util.is_sync_f_exist(dir_path):
         util.create_empty_sync_f(dir_path)
@@ -26,7 +24,6 @@ def single_dir_syncing(dir_path):
     # part 1 of single dir sync ---------------------------------------------------------
     for file_obj in file_obj_list:
         key = file_obj.file_name
-
 
         if not (sync_dict.keys().__contains__(key)):
             util.new_key_entry_to_sync_dict(sync_dict, file_obj)
@@ -62,12 +59,60 @@ def single_dir_syncing(dir_path):
     # -----------------------------------------------------------------------------------
     util.update_sync_f(sync_file_path, sync_dict)
 
-    # recursive function call for all sub-directories (single-dir-syncing) --------------
+    # recursive function call for all subdirectories (single-dir-syncing) --------------
     sub_dir_list = util.get_dir_list_from_dir(dir_path)
     if len(sub_dir_list) != 0:
         for sub_dir in sub_dir_list:
             single_dir_syncing(sub_dir)
     # -----------------------------------------------------------------------------------
+
+
+def merge_dir_syncing(curr_dir, other_dir):
+    file_obj_l_curr = util.get_file_list_from_dir(curr_dir)
+    file_obj_l_other = util.get_file_list_from_dir(other_dir)
+
+    # get current dir sync file info
+    sync_f_path_curr = Path(str(curr_dir) + "/.sync")
+    sync_dict_curr = util.read_sync_f(sync_f_path_curr)
+
+    # get other dir sync file info
+    sync_f_path_other = Path(str(other_dir) + "/.sync")
+    sync_dict_other = util.read_sync_f(sync_f_path_other)
+
+    curr_f_name_list = []
+    for file_obj_c_temp_ONLY in file_obj_l_curr:
+        curr_f_name_list.append(file_obj_c_temp_ONLY.file_name)
+
+    other_f_name_list = []
+    for file_obj_o_temp_ONLY in file_obj_l_other:
+        other_f_name_list.append(file_obj_o_temp_ONLY.file_name)
+
+    for file_obj_curr in file_obj_l_curr:
+        # is file DOESN'T exist in OTHER dir file list?
+        if file_obj_curr.file_name not in other_f_name_list:
+            # is file deleted in OTHER dir?
+            if (file_obj_curr.file_name in sync_dict_other.keys()) and (sync_dict_other[file_obj_curr.file_name][0][1] == "deleted"):
+                # Has the file been just deleted in CURRENT dir?
+                if (len(sync_dict_curr[file_obj_curr.file_name]) > 1) and (sync_dict_curr[file_obj_curr.file_name][1][1] == "deleted"):
+                    # ACTION 2
+                    util.copy_to_other_dir(file_obj_curr.posix_path, other_dir)
+                    util.update_sync_dict_entry(file_obj_curr, sync_dict_other)
+                    continue
+                # the file has not been just deleted in CURRENT dir.
+                else:
+                    # ACTION 1
+                    util.delete_file(file_obj_curr.posix_path)
+                    util.insert_delete_to_sync_dict(sync_dict_curr, file_obj_curr.file_name)
+                    continue
+            # file is NOT deleted in OTHER dir
+            else:
+                # ACTION 2
+                util.copy_to_other_dir(file_obj_curr.posix_path, other_dir)
+                util.update_sync_dict_entry(file_obj_curr, sync_dict_other)
+                continue
+        # file EXIST in OTHER dir file list
+        else:
+            pass
 
 
 def main():
@@ -93,6 +138,8 @@ def main():
     dir_path_list = [Path(dir_list[0]), Path(dir_list[1])]
     for dir_path in dir_path_list:
         single_dir_syncing(dir_path)
+
+    merge_dir_syncing(dir_path_list[0], dir_path_list[1])
 
 
 main()

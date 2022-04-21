@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 from datetime import datetime
 from file import File
+import shutil
 
 
 def gen_digest(f_content):
@@ -133,6 +134,32 @@ def new_key_entry_to_sync_dict(sync_dict, file_object):
     f_name_key = file_object.file_name
     if not (sync_dict.keys().__contains__(f_name_key)):
         sync_dict[f_name_key] = [f_status_list]
+
+
+def copy_to_other_dir(f_path, other_dir_path):
+    shutil.copy(f_path, other_dir_path)
+
+
+def delete_file(f_path):
+    os.remove(f_path)
+
+
+def is_file_in_record(f_obj, sync_dict):
+    f_name_key_l = []
+    for key in sync_dict.keys():
+        f_name_key_l.append(key)
+    if f_obj.file_name in f_name_key_l:
+        return True
+    else:
+        return False
+
+
+def update_sync_dict_entry(f_obj, sync_dict):
+    """checking if file name key exist in sync_dict first"""
+    if is_file_in_record(f_obj, sync_dict):
+        insert_entry_to_sync_dict(sync_dict, f_obj)
+    else:
+        new_key_entry_to_sync_dict(sync_dict, f_obj)
 
 
 def get_file_list_from_dir(dir_path):

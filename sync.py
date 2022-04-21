@@ -69,24 +69,6 @@ def single_dir_syncing(dir_path):
 
 def merge_dir_syncing(curr_dir, other_dir):
 
-    curr_sub_dir_list = util.get_dir_list_from_dir(curr_dir)
-    other_sub_dir_list = util.get_dir_list_from_dir(other_dir)
-
-    curr_sub_dir_basename_list = []
-    other_sub_dir_basename_list = []
-
-    for curr_sub in curr_sub_dir_list:
-        curr_sub_dir_basename_list.append(os.path.basename(curr_sub))
-    for other_sub in other_sub_dir_list:
-        other_sub_dir_basename_list.append(os.path.basename(other_sub))
-
-    for i in range(len(curr_sub_dir_basename_list)):
-        if curr_sub_dir_basename_list[i] in other_sub_dir_basename_list:
-            continue
-        # copy dirs from CURRENT to OTHER if current dir doesn't exist in other dir
-        else:
-            shutil.copytree(curr_sub_dir_list[i], Path(str(other_dir)+"/"+curr_sub_dir_basename_list[i]))
-
     file_obj_l_curr = util.get_file_list_from_dir(curr_dir)
     file_obj_l_other = util.get_file_list_from_dir(other_dir)
 
@@ -185,7 +167,6 @@ def merge_dir_syncing(curr_dir, other_dir):
     util.update_sync_f(sync_f_path_other, sync_dict_other)
 
 
-
 def main():
     # parse args from the stdin and make sure it contains only 2 dirs
     dir_list = sys.argv
@@ -209,6 +190,8 @@ def main():
     dir_path_list = [Path(dir_list[0]), Path(dir_list[1])]
     for dir_path in dir_path_list:
         single_dir_syncing(dir_path)
+
+    util.sync_dir_and_sub_dir(dir_path_list[0], dir_path_list[1])
 
     merge_dir_syncing(dir_path_list[0], dir_path_list[1])
     merge_dir_syncing(dir_path_list[1], dir_path_list[0])

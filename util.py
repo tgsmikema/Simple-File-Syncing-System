@@ -195,3 +195,31 @@ def search_f_in_file_list_by_name(file_obj, file_obj_l):
         if target_f.file_name == file_obj.file_name:
             return target_f
     return None
+
+
+def one_way_copy_dir_and_sub(curr_dir, other_dir):
+
+    curr_sub_dir_list = get_dir_list_from_dir(curr_dir)
+    other_sub_dir_list = get_dir_list_from_dir(other_dir)
+
+    curr_sub_dir_basename_list = []
+    other_sub_dir_basename_list = []
+
+    for curr_sub in curr_sub_dir_list:
+        curr_sub_dir_basename_list.append(os.path.basename(curr_sub))
+    for other_sub in other_sub_dir_list:
+        other_sub_dir_basename_list.append(os.path.basename(other_sub))
+
+    for i in range(len(curr_sub_dir_basename_list)):
+        if curr_sub_dir_basename_list[i] in other_sub_dir_basename_list:
+            continue
+        # copy dirs from CURRENT to OTHER if current dir doesn't exist in other dir
+        else:
+            shutil.copytree(curr_sub_dir_list[i], Path(str(other_dir) + "/" + curr_sub_dir_basename_list[i]))
+
+    # consider moving above +++++++++++ code to outside of the function since shutil is recursive call
+
+
+def sync_dir_and_sub_dir(curr_dir, other_dir):
+    one_way_copy_dir_and_sub(curr_dir, other_dir)
+    one_way_copy_dir_and_sub(other_dir, curr_dir)

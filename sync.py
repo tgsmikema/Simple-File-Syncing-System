@@ -142,7 +142,7 @@ def merge_dir_syncing(curr_dir, other_dir):
                     else:
                         temp_f_obj_other = util.search_f_in_file_list_by_name(file_obj_curr, file_obj_l_other)
                         change_to_mod = temp_f_obj_other.mod_time_tstamp
-                        util.set_f_mod_time(file_obj_curr, change_to_mod)
+                        util.set_f_mod_time(file_obj_curr.posix_path, change_to_mod)
                         file_obj_curr.mod_time_tstamp = change_to_mod
                         util.insert_entry_to_sync_dict(sync_dict_curr, file_obj_curr)
                         continue

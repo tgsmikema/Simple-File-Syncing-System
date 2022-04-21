@@ -199,7 +199,6 @@ def search_f_in_file_list_by_name(file_obj, file_obj_l):
 
 
 def one_way_copy_dir_and_sub(curr_dir, other_dir):
-
     curr_sub_dir_list = get_dir_list_from_dir(curr_dir)
     other_sub_dir_list = get_dir_list_from_dir(other_dir)
 
@@ -212,15 +211,46 @@ def one_way_copy_dir_and_sub(curr_dir, other_dir):
         other_sub_dir_basename_list.append(os.path.basename(other_sub))
 
     for i in range(len(curr_sub_dir_basename_list)):
-        if curr_sub_dir_basename_list[i] in other_sub_dir_basename_list:
-            continue
-        # copy dirs from CURRENT to OTHER if current dir doesn't exist in other dir
-        else:
-            shutil.copytree(curr_sub_dir_list[i], Path(str(other_dir) + "/" + curr_sub_dir_basename_list[i]))
+        # if curr_sub_dir_basename_list[i] in other_sub_dir_basename_list:
+        #     continue
+        # # copy dirs from CURRENT to OTHER if current dir doesn't exist in other dir
+        # else:
+        shutil.copytree(curr_sub_dir_list[i], Path(str(other_dir) + "/" + curr_sub_dir_basename_list[i]), dirs_exist_ok=True, ignore=ignore_files)
 
     # consider moving above +++++++++++ code to outside of the function since shutil is recursive call
 
 
-def sync_dir_and_sub_dir(curr_dir, other_dir):
+def sync_dir_and_sub_dir_no_files(curr_dir, other_dir):
     one_way_copy_dir_and_sub(curr_dir, other_dir)
     one_way_copy_dir_and_sub(other_dir, curr_dir)
+
+
+def ignore_files(dirs, files):
+    return [f for f in files if os.path.isfile(os.path.join(dirs, f))]
+
+
+def get_head_of_path_no_slash(path):
+    path_str = str(path)
+    parts_list = path_str.split("/")
+    path_of_head = Path(parts_list[0])
+    return path_of_head
+
+
+def get_tail_of_path_begin_slash(path):
+    path_str = str(path)
+    parts_list = path_str.split("/")
+    str_builder = ""
+    for i in range(1, len(parts_list)):
+        str_builder += parts_list[i] + "/"
+    if str_builder != "":
+        str_builder = "/" + str_builder
+    tail_path = Path(str_builder)
+    return tail_path
+
+
+def join_head_and_tail(head, tail):
+    h_str = str(head)
+    t_str = str(tail)
+    full_str = h_str + t_str
+    full_path = Path(full_str)
+    return full_path

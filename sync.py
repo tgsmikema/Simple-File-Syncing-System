@@ -71,7 +71,6 @@ def single_dir_syncing(dir_path):
 
 
 def merge_dir_syncing(curr_dir, other_dir):
-
     file_obj_l_curr = util.get_file_list_from_dir(curr_dir)
     file_obj_l_other = util.get_file_list_from_dir(other_dir)
 
@@ -95,9 +94,11 @@ def merge_dir_syncing(curr_dir, other_dir):
         # is file DOESN'T exist in OTHER dir file list?
         if file_obj_curr.file_name not in other_f_name_list:
             # is file deleted in OTHER dir?
-            if (file_obj_curr.file_name in sync_dict_other.keys()) and (sync_dict_other[file_obj_curr.file_name][0][1] == "deleted"):
+            if (file_obj_curr.file_name in sync_dict_other.keys()) and (
+                    sync_dict_other[file_obj_curr.file_name][0][1] == "deleted"):
                 # Has the file been just deleted in CURRENT dir?
-                if (len(sync_dict_curr[file_obj_curr.file_name]) > 1) and (sync_dict_curr[file_obj_curr.file_name][1][1] == "deleted"):
+                if (len(sync_dict_curr[file_obj_curr.file_name]) > 1) and (
+                        sync_dict_curr[file_obj_curr.file_name][1][1] == "deleted"):
                     util.copy_to_other_dir(file_obj_curr.posix_path, other_dir)
                     util.update_sync_dict_entry(file_obj_curr, sync_dict_other)
                     continue
@@ -169,6 +170,15 @@ def merge_dir_syncing(curr_dir, other_dir):
     util.update_sync_f(sync_f_path_curr, sync_dict_curr)
     util.update_sync_f(sync_f_path_other, sync_dict_other)
 
+    curr_sub_dir_list = util.get_dir_list_from_dir(curr_dir)
+    other_sub_dir_list = util.get_dir_list_from_dir(other_dir)
+
+    if len(curr_sub_dir_list) != 0:
+        other_sub_dir_head = util.get_head_of_path_no_slash(other_sub_dir_list[0])
+        for sub_dir in curr_sub_dir_list:
+            other_sub_dir_tail = util.get_tail_of_path_begin_slash(sub_dir)
+            merge_dir_syncing(sub_dir, util.join_head_and_tail(other_sub_dir_head, other_sub_dir_tail))
+
 
 def main():
     # parse args from the stdin and make sure it contains only 2 dirs
@@ -191,10 +201,11 @@ def main():
     # -------------------------------------------------------------------------
 
     dir_path_list = [Path(dir_list[0]), Path(dir_list[1])]
+
+    util.sync_dir_and_sub_dir_no_files(dir_path_list[0], dir_path_list[1])
+
     for dir_path in dir_path_list:
         single_dir_syncing(dir_path)
-
-    util.sync_dir_and_sub_dir(dir_path_list[0], dir_path_list[1])
 
     merge_dir_syncing(dir_path_list[0], dir_path_list[1])
     merge_dir_syncing(dir_path_list[1], dir_path_list[0])

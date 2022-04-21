@@ -188,3 +188,10 @@ def get_dir_list_from_dir(dir_path):
             d_list.append(dir_posix_path)
 
     return d_list
+
+
+def search_f_in_file_list_by_name(file_obj, file_obj_l):
+    for target_f in file_obj_l:
+        if target_f.file_name == file_obj.file_name:
+            return target_f
+    return None

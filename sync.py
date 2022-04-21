@@ -94,25 +94,77 @@ def merge_dir_syncing(curr_dir, other_dir):
             if (file_obj_curr.file_name in sync_dict_other.keys()) and (sync_dict_other[file_obj_curr.file_name][0][1] == "deleted"):
                 # Has the file been just deleted in CURRENT dir?
                 if (len(sync_dict_curr[file_obj_curr.file_name]) > 1) and (sync_dict_curr[file_obj_curr.file_name][1][1] == "deleted"):
-                    # ACTION 2
                     util.copy_to_other_dir(file_obj_curr.posix_path, other_dir)
                     util.update_sync_dict_entry(file_obj_curr, sync_dict_other)
                     continue
                 # the file has not been just deleted in CURRENT dir.
                 else:
-                    # ACTION 1
                     util.delete_file(file_obj_curr.posix_path)
                     util.insert_delete_to_sync_dict(sync_dict_curr, file_obj_curr.file_name)
                     continue
             # file is NOT deleted in OTHER dir
             else:
-                # ACTION 2
                 util.copy_to_other_dir(file_obj_curr.posix_path, other_dir)
                 util.update_sync_dict_entry(file_obj_curr, sync_dict_other)
                 continue
         # file EXIST in OTHER dir file list
         else:
-            pass
+            # is current file SHA256 digestion SAME with same file in the OTHER dir?
+            if file_obj_curr.digest == sync_dict_other[file_obj_curr.file_name][0][1]:
+                # is file MOD TIME the SAME with same file in OTHER dir?
+                if file_obj_curr.mod_time_str == sync_dict_other[file_obj_curr.file_name][0][0]:
+                    # it's the same file, continue with the next file round
+                    continue
+                # file MOD TIME NOT! the SAME with same file in OTHER dir
+                else:
+                    curr_f_mod = file_obj_curr.mod_time_tstamp
+                    other_f_mod = util.convert_mod_str_to_ts(sync_dict_other[file_obj_curr.file_name][0][0])
+                    # is the EARLIEST MOD TIME from the file in CURRENT dir?
+                    if curr_f_mod <= other_f_mod:
+                        change_to_mod = file_obj_curr.mod_time_tstamp
+                        temp_f_obj_other = util.search_f_in_file_list_by_name(file_obj_curr, file_obj_l_other)
+                        util.set_f_mod_time(temp_f_obj_other.posix_path, change_to_mod)
+                        temp_f_obj_other.mod_time_tstamp = change_to_mod
+                        util.insert_entry_to_sync_dict(sync_dict_other, temp_f_obj_other)
+                        continue
+                    # the EARLIEST MOD TIME from the file in OTHER dir
+                    else:
+                        temp_f_obj_other = util.search_f_in_file_list_by_name(file_obj_curr, file_obj_l_other)
+                        change_to_mod = temp_f_obj_other.mod_time_tstamp
+                        util.set_f_mod_time(file_obj_curr, change_to_mod)
+                        file_obj_curr.mod_time_tstamp = change_to_mod
+                        util.insert_entry_to_sync_dict(sync_dict_curr, file_obj_curr)
+                        continue
+            # current file SHA256 digestion is NOT! SAME with same file in the OTHER dir (different file)
+            else:
+                file_key_name = file_obj_curr.file_name
+                digest_list_other = []
+                for record_l in sync_dict_other[file_key_name]:
+                    digest_list_other.append(record_l[1])
+                # IS CURRENT digest in CURRENT dir exist in previous entries in OTHER dir?
+                if file_obj_curr.digest in digest_list_other:
+                    util.copy_to_other_dir(file_obj_curr.posix_path, other_dir)
+                    util.insert_entry_to_sync_dict(sync_dict_other, file_obj_curr)
+                    continue
+                # CURRENT digest in CURRENT dir DOESN'T! exist in previous entries in OTHER dir
+                else:
+                    curr_mod_time = file_obj_curr.mod_time_tstamp
+                    other_mod_time = util.convert_mod_str_to_ts(sync_dict_other[file_obj_curr.file_name][0][0])
+                    # IS most RECENT MOD time from file in CURRENT dir?
+                    if curr_mod_time >= other_mod_time:
+                        util.copy_to_other_dir(file_obj_curr.posix_path, other_dir)
+                        util.insert_entry_to_sync_dict(sync_dict_other, file_obj_curr)
+                        continue
+                    # most RECENT MOD time is the file in OTHER dir.
+                    else:
+                        temp_f_obj_other = util.search_f_in_file_list_by_name(file_obj_curr, file_obj_l_other)
+                        util.copy_to_other_dir(temp_f_obj_other, curr_dir)
+                        util.insert_entry_to_sync_dict(sync_dict_curr, temp_f_obj_other)
+                        continue
+
+    util.update_sync_f(sync_f_path_curr, sync_dict_curr)
+    util.update_sync_f(sync_f_path_other, sync_dict_other)
+
 
 
 def main():
@@ -140,6 +192,7 @@ def main():
         single_dir_syncing(dir_path)
 
     merge_dir_syncing(dir_path_list[0], dir_path_list[1])
+    merge_dir_syncing(dir_path_list[1], dir_path_list[0])
 
 
 main()

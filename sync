@@ -100,7 +100,7 @@ def merge_dir_syncing(curr_dir, other_dir):
                     sync_dict_other[file_obj_curr.file_name][0][1] == "deleted"):
                 # Has the file been just deleted in CURRENT dir?
                 if (len(sync_dict_curr[file_obj_curr.file_name]) > 1) and (
-                        sync_dict_curr[file_obj_curr.file_name][1][1] == "deleted"):
+                        sync_dict_curr[file_obj_curr.file_name][1][1] == "deleted") and (sync_dict_curr[file_obj_curr.file_name][1][0] == sync_dict_other[file_obj_curr.file_name][0][0]):
                     util.copy_to_other_dir(file_obj_curr.posix_path, other_dir)
                     util.update_sync_dict_entry(file_obj_curr, sync_dict_other)
                     continue

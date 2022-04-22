@@ -1,3 +1,0 @@
-The contents of file, base/dir2/a.txt:
-This should replace the one in dir1.
-changed in both.

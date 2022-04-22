@@ -1,3 +1,0 @@
-The contents of file, base/dir1/b.txt:
-Also, not very exciting.
-changed in both.

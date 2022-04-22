@@ -12,7 +12,7 @@ dir_list = os.listdir(path)
 file_list = []
 dictdict = {"11": "2", "22": "222"}
 
-print(dictdict.keys().__contains__("114"))
+# print(dictdict.keys().__contains__("114"))
 
 # util.sync_dir_and_sub_dir_no_files('dir1', 'dir2')
 
@@ -20,3 +20,7 @@ print(dictdict.keys().__contains__("114"))
 #
 # print(util.get_head_of_path_no_slash(sss))
 # print(util.get_tail_of_path_begin_slash(sss))
+
+print(util.get_f_mod_time_string('dir2/a.txt'))
+print(util.get_f_mod_time_string('dir2/b.txt'))
+print(util.get_f_mod_time_string('dir2/c.txt'))

@@ -1,7 +1,5 @@
-# 370-Assignment-2
+# Simple-File-Syncing-System
 Author: Siqi Ma
-
-UPI: sma148
 
 # how to run
 
